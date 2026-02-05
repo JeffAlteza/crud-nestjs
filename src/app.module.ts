@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { config } from 'process';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -20,7 +19,7 @@ import { UsersModule } from './users/users.module';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true, // dev only
+        synchronize: config.get<boolean>('DB_SYNCHRONIZE'), // dev only
       }),
     }),
 
