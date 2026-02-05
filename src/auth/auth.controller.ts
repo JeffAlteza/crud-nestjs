@@ -1,6 +1,7 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDTO } from './dto/login.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -13,4 +14,12 @@ export class AuthController {
     login(@Body() loginDTO: LoginDTO) {
         return this.authService.authenticate(loginDTO);
     }
+
+    @UseGuards(AuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @Get('me')
+    getUserInfo( @Request() request ) {
+        return { message: 'This is a protected route', user: request.user };
+    }
+
 }
