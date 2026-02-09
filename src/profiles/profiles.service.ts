@@ -4,6 +4,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Profile } from './entities/profile.entity';
 import { Repository } from 'typeorm';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class ProfilesService {
@@ -21,8 +22,18 @@ export class ProfilesService {
     return this.profilesRepository.save(createProfileDto);
   }
 
-  findAll() {
-    return this.profilesRepository.find({ relations: ['user'] });
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<Profile>> {
+    const allowedRelations = ['user'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
+
+    return paginate(query, this.profilesRepository, {
+      sortableColumns: ['id', 'userId'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['bio', 'address'],
+      relations: relations,
+    });
   }
 
   findOne(id: number) {

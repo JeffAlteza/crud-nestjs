@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { FilterPostDto } from './dto/filter-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
+import { paginate, Paginated, PaginateQuery, FilterOperator } from 'nestjs-paginate';
 
 @Injectable()
 export class PostsService {
@@ -16,20 +16,21 @@ export class PostsService {
     return this.postsRepository.save(createPostDto);
   }
 
-  findAll(filterDto?: FilterPostDto) {
-    const where: FindOptionsWhere<Post> = {};
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<Post>> {
+    const allowedRelations = ['user'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
 
-    if (filterDto?.userId) {
-      where.userId = filterDto.userId;
-    }
-
-    if (filterDto?.published !== undefined) {
-      where.published = filterDto.published;
-    }
-
-    return this.postsRepository.find({
-      where,
-      relations: ['user'],
+    return paginate(query, this.postsRepository, {
+      sortableColumns: ['id', 'title', 'published', 'createdAt'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['title', 'content'],
+      filterableColumns: {
+        userId: [FilterOperator.EQ],
+        published: [FilterOperator.EQ],
+      },
+      relations: relations,
     });
   }
 

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6d851042-366a-472b-a9a2-a1f4bcd8d8b7",
     "name": "CRUD NestJS API",
-    "description": "API collection for NestJS CRUD application with Users, Profiles, Posts, and Auth",
+    "description": "CRUD NestJS API Postman V5.0.0 - With Pagination & Include",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33358985",
     "_collection_link": "https://go.postman.co/collection/33358985-6d851042-366a-472b-a9a2-a1f4bcd8d8b7?source=collection_link"
@@ -37,7 +37,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -131,9 +131,46 @@
               ],
               "path": [
                 "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.name",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.age",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "profile,posts,roles",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all users with their profiles"
+            "description": "Get all users with pagination. Available includes: profile, posts, roles"
           },
           "response": []
         },
@@ -271,9 +308,36 @@
               ],
               "path": [
                 "profiles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "user",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all profiles with user info"
+            "description": "Get all profiles with pagination. Available includes: user"
           },
           "response": []
         },
@@ -436,9 +500,46 @@
               ],
               "path": [
                 "posts"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.userId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.published",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "user",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all posts with user info"
+            "description": "Get all posts with pagination. Available includes: user"
           },
           "response": []
         },
@@ -549,6 +650,263 @@
         }
       ],
       "description": "Post management endpoints (Protected) - One-to-Many with User"
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"viewer\",\n  \"description\": \"Can only view content\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            },
+            "description": "Create a new role"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "users",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all roles with pagination. Available includes: users"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
+            },
+            "description": "Get a specific role by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"super-admin\",\n  \"description\": \"Super administrator with all permissions\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
+            },
+            "description": "Update an existing role"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Role",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "1"
+              ]
+            },
+            "description": "Delete a role"
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Roles to User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"roleIds\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "assign"
+              ]
+            },
+            "description": "Assign roles to a user (replaces existing roles)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/roles/user/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "user",
+                "1"
+              ]
+            },
+            "description": "Get all roles for a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Roles from User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleIds\": [2]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/user/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "roles",
+                "user",
+                "1"
+              ]
+            },
+            "description": "Remove specific roles from a user"
+          },
+          "response": []
+        }
+      ],
+      "description": "Role management endpoints (Protected) - Many-to-Many with User"
     }
   ],
   "auth": {

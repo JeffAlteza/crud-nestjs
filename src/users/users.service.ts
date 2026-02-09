@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-
+import { FilterOperator, FilterSuffix, paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class UsersService {
@@ -22,8 +22,22 @@ export class UsersService {
     return this.usersRepository.save(createUserDto);
   }
 
-  findAll() {
-    return this.usersRepository.find({ relations: ['profile','posts'] });
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<User>> {
+    const allowedRelations = ['profile', 'posts', 'roles'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
+
+    return paginate(query, this.usersRepository, {
+      sortableColumns: ['id', 'name', 'email', 'age'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['name', 'email'],
+      filterableColumns: {
+        name: [FilterOperator.EQ, FilterSuffix.NOT],
+        age: true,
+      },
+      relations: relations,
+    });
   }
 
   findOne(id: number) {
@@ -32,7 +46,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.findUserIndexById(id);
-    
+
     return this.usersRepository.save({ ...user, ...updateUserDto });
   }
 
@@ -45,7 +59,7 @@ export class UsersService {
   private async findUserIndexById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
-      relations: ['profile','posts'],
+      relations: ['profile', 'posts', 'roles'],
     });
 
     if (user) {

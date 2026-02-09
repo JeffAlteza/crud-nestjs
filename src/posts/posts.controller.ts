@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Query } fro
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { FilterPostDto } from './dto/filter-post.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { Paginate } from 'nestjs-paginate';
+import type { PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(AuthGuard)
 @Controller('posts')
@@ -16,8 +17,12 @@ export class PostsController {
   }
 
   @Get()
-  findAll(@Query() filterDto: FilterPostDto) {
-    return this.postsService.findAll(filterDto);
+  findAll(
+    @Paginate() query: PaginateQuery,
+    @Query('include') include?: string,
+  ) {
+    const includeRelation = include ? include.split(',') : undefined;
+    return this.postsService.findAll(query, includeRelation);
   }
 
   @Get(':id')
