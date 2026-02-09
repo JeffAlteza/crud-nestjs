@@ -1,6 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { Profile } from "../../profiles/entities/profile.entity";
+import { Post } from "../../posts/entities/post.entity";
 
 @Entity('users')
 export class User {
@@ -21,6 +22,9 @@ export class User {
 
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   @BeforeInsert()
   @BeforeUpdate()

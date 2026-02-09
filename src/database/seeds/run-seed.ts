@@ -2,8 +2,10 @@ import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
 import { User } from '../../users/entities/user.entity';
 import { Profile } from '../../profiles/entities/profile.entity';
+import { Post } from '../../posts/entities/post.entity';
 import { seedUsers } from './user.seeder';
 import { seedProfiles } from './profile.seeder';
+import { seedPosts } from './post.seeder';
 
 config();
 
@@ -14,7 +16,7 @@ const dataSource = new DataSource({
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  entities: [User, Profile],
+  entities: [User, Profile, Post],
   synchronize: false,
 });
 
@@ -29,6 +31,10 @@ async function runSeeders() {
 
     console.log('--- Seeding Profiles ---');
     await seedProfiles(dataSource, users);
+    console.log('');
+
+    console.log('--- Seeding Posts ---');
+    await seedPosts(dataSource, users);
     console.log('');
 
     console.log('Seeding completed successfully!');
