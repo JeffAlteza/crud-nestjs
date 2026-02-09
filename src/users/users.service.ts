@@ -22,7 +22,12 @@ export class UsersService {
     return this.usersRepository.save(createUserDto);
   }
 
-  findAll(query: PaginateQuery): Promise<Paginated<User>> {
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<User>> {
+    const allowedRelations = ['profile', 'posts', 'roles'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
+
     return paginate(query, this.usersRepository, {
       sortableColumns: ['id', 'name', 'email', 'age'],
       defaultSortBy: [['id', 'ASC']],
@@ -31,7 +36,7 @@ export class UsersService {
         name: [FilterOperator.EQ, FilterSuffix.NOT],
         age: true,
       },
-      relations: ['profile', 'posts', 'roles'],
+      relations: relations,
     });
   }
 

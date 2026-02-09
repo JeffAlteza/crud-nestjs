@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from './entities/role.entity';
 import { In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class RolesService {
@@ -24,8 +25,18 @@ export class RolesService {
     return this.rolesRepository.save(createRoleDto);
   }
 
-  findAll() {
-    return this.rolesRepository.find({ relations: ['users'] });
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<Role>> {
+    const allowedRelations = ['users'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
+
+    return paginate(query, this.rolesRepository, {
+      sortableColumns: ['id', 'name'],
+      defaultSortBy: [['id', 'ASC']],
+      searchableColumns: ['name', 'description'],
+      relations: relations,
+    });
   }
 
   findOne(id: number) {

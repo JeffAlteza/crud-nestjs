@@ -16,7 +16,12 @@ export class PostsService {
     return this.postsRepository.save(createPostDto);
   }
 
-  findAll(query: PaginateQuery): Promise<Paginated<Post>> {
+  findAll(query: PaginateQuery, include?: string[]): Promise<Paginated<Post>> {
+    const allowedRelations = ['user'];
+    const relations = include
+      ? include.filter((rel) => allowedRelations.includes(rel))
+      : [];
+
     return paginate(query, this.postsRepository, {
       sortableColumns: ['id', 'title', 'published', 'createdAt'],
       defaultSortBy: [['id', 'ASC']],
@@ -25,7 +30,7 @@ export class PostsService {
         userId: [FilterOperator.EQ],
         published: [FilterOperator.EQ],
       },
-      relations: ['user'],
+      relations: relations,
     });
   }
 

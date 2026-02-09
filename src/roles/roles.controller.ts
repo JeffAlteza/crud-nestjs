@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Query } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { AssignRoleDto } from './dto/assign-role.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { Paginate } from 'nestjs-paginate';
+import type { PaginateQuery } from 'nestjs-paginate';
 
 @UseGuards(AuthGuard)
 @Controller('roles')
@@ -16,8 +18,12 @@ export class RolesController {
   }
 
   @Get()
-  findAll() {
-    return this.rolesService.findAll();
+  findAll(
+    @Paginate() query: PaginateQuery,
+    @Query('include') include?: string,
+  ) {
+    const includeRelation = include ? include.split(',') : undefined;
+    return this.rolesService.findAll(query, includeRelation);
   }
 
   @Get(':id')

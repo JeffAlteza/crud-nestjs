@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -17,8 +17,12 @@ export class PostsController {
   }
 
   @Get()
-  findAll(@Paginate() query: PaginateQuery) {
-    return this.postsService.findAll(query);
+  findAll(
+    @Paginate() query: PaginateQuery,
+    @Query('include') include?: string,
+  ) {
+    const includeRelation = include ? include.split(',') : undefined;
+    return this.postsService.findAll(query, includeRelation);
   }
 
   @Get(':id')

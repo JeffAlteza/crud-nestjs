@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,8 +17,12 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Paginate() query: PaginateQuery) {
-    return this.usersService.findAll(query);
+  findAll(
+    @Paginate() query: PaginateQuery,
+    @Query('include') include?: string,
+  ) {
+    const includeRelation = include ? include.split(',') : undefined;
+    return this.usersService.findAll(query, includeRelation);
   }
 
   @Get(':id')
