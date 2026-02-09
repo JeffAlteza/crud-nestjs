@@ -1,5 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { Profile } from "../../profiles/entities/profile.entity";
 
 @Entity('users')
 export class User {
@@ -17,6 +18,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Profile;
 
   @BeforeInsert()
   @BeforeUpdate()

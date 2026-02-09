@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -22,7 +23,7 @@ export class UsersService {
   }
 
   findAll() {
-    return this.usersRepository.find();
+    return this.usersRepository.find({ relations: ['profile'] });
   }
 
   findOne(id: number) {
@@ -37,12 +38,15 @@ export class UsersService {
 
   async remove(id: number) {
     const user = await this.findUserIndexById(id);
-    
-    return this.usersRepository.delete(user);
+
+    return this.usersRepository.delete(user.id);
   }
 
   private async findUserIndexById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['profile'],
+    });
 
     if (user) {
       return user;
