@@ -27,6 +27,7 @@
     "seed:fresh": "npm run migration:fresh && npm run seed"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",

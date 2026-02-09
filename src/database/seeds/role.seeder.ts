@@ -1,58 +1,84 @@
 import { DataSource } from 'typeorm';
 import { Role } from '../../roles/entities/role.entity';
 import { User } from '../../users/entities/user.entity';
+import { faker } from '@faker-js/faker';
 
 export async function seedRoles(dataSource: DataSource, users: User[]): Promise<void> {
   const roleRepository = dataSource.getRepository(Role);
   const userRepository = dataSource.getRepository(User);
 
+  // Predefined roles
   const rolesData = [
     { name: 'admin', description: 'Administrator with full access' },
     { name: 'user', description: 'Regular user with basic access' },
     { name: 'editor', description: 'Can edit and publish content' },
     { name: 'moderator', description: 'Can moderate user content' },
+    { name: 'viewer', description: 'Can only view content' },
+    { name: 'contributor', description: 'Can contribute content for review' },
+    { name: 'manager', description: 'Can manage teams and projects' },
+    { name: 'analyst', description: 'Can view analytics and reports' },
+    { name: 'support', description: 'Customer support representative' },
+    { name: 'developer', description: 'Developer access for APIs' },
   ];
 
-  const createdRoles: Role[] = [];
+  // Create roles if they don't exist
+  let createdRoles: Role[] = await roleRepository.find();
 
-  // Create roles
-  for (const roleData of rolesData) {
-    let role = await roleRepository.findOneBy({ name: roleData.name });
+  if (createdRoles.length === 0) {
+    console.log('Creating 10 roles...');
 
-    if (!role) {
-      role = await roleRepository.save(roleData);
+    for (const roleData of rolesData) {
+      const role = roleRepository.create(roleData);
+      await roleRepository.save(role);
       console.log(`Created role: ${roleData.name}`);
-    } else {
-      console.log(`Role already exists: ${roleData.name}`);
     }
 
-    createdRoles.push(role);
+    createdRoles = await roleRepository.find();
+  } else {
+    console.log(`Roles already exist (${createdRoles.length} found).`);
   }
 
-  // Assign roles to users
-  const roleAssignments = [
-    { userIndex: 0, roleNames: ['admin', 'user'] },      // Admin User gets admin + user
-    { userIndex: 1, roleNames: ['user', 'editor'] },    // John gets user + editor
-    { userIndex: 2, roleNames: ['user'] },              // Jane gets user only
-  ];
+  // Check if users already have roles assigned
+  const userWithRoles = await userRepository.findOne({
+    where: { id: users[0]?.id },
+    relations: ['roles'],
+  });
 
-  for (const assignment of roleAssignments) {
-    if (users[assignment.userIndex]) {
-      const user = await userRepository.findOne({
-        where: { id: users[assignment.userIndex].id },
-        relations: ['roles'],
-      });
+  if ((userWithRoles?.roles?.length ?? 0) > 0) {
+    console.log('Users already have roles assigned. Skipping role assignment...');
+    return;
+  }
 
-      if (user && (!user.roles || user.roles.length === 0)) {
-        const rolesToAssign = createdRoles.filter((r) =>
-          assignment.roleNames.includes(r.name),
-        );
-        user.roles = rolesToAssign;
-        await userRepository.save(user);
-        console.log(`Assigned roles [${assignment.roleNames.join(', ')}] to user: ${user.email}`);
-      } else if (user) {
-        console.log(`User ${user.email} already has roles assigned`);
+  // Assign 1-5 random roles to each user
+  console.log(`Assigning 1-5 random roles to ${users.length} users...`);
+
+  const batchSize = 100;
+  let processedCount = 0;
+
+  for (let i = 0; i < users.length; i += batchSize) {
+    const batchUsers = users.slice(i, i + batchSize);
+
+    for (const user of batchUsers) {
+      // Get 1-5 random roles for this user
+      const numRoles = faker.number.int({ min: 1, max: 5 });
+      const shuffledRoles = faker.helpers.shuffle([...createdRoles]);
+      const userRoles = shuffledRoles.slice(0, numRoles);
+
+      // Use query builder for direct pivot table insert (faster)
+      for (const role of userRoles) {
+        await dataSource
+          .createQueryBuilder()
+          .insert()
+          .into('user_roles')
+          .values({ user_id: user.id, role_id: role.id })
+          .orIgnore() // Skip if already exists
+          .execute();
       }
     }
+
+    processedCount += batchUsers.length;
+    console.log(`Assigned roles to users ${i + 1} to ${Math.min(i + batchSize, users.length)}`);
   }
+
+  console.log(`Completed role assignment for ${users.length} users`);
 }
