@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6d851042-366a-472b-a9a2-a1f4bcd8d8b7",
     "name": "CRUD NestJS API",
-    "description": "CRUD NestJS API Postman V4.0.0",
+    "description": "CRUD NestJS API Postman V5.0.0 - With Pagination & Include",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "33358985",
     "_collection_link": "https://go.postman.co/collection/33358985-6d851042-366a-472b-a9a2-a1f4bcd8d8b7?source=collection_link"
@@ -37,7 +37,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -131,9 +131,46 @@
               ],
               "path": [
                 "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.name",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.age",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "profile,posts,roles",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all users with their profiles"
+            "description": "Get all users with pagination. Available includes: profile, posts, roles"
           },
           "response": []
         },
@@ -271,9 +308,36 @@
               ],
               "path": [
                 "profiles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "user",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all profiles with user info"
+            "description": "Get all profiles with pagination. Available includes: user"
           },
           "response": []
         },
@@ -436,9 +500,46 @@
               ],
               "path": [
                 "posts"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.userId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "filter.published",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "user",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all posts with user info"
+            "description": "Get all posts with pagination. Available includes: user"
           },
           "response": []
         },
@@ -601,9 +702,36 @@
               ],
               "path": [
                 "roles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "id:ASC",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "include",
+                  "value": "users",
+                  "disabled": true
+                }
               ]
             },
-            "description": "Get all roles with their users"
+            "description": "Get all roles with pagination. Available includes: users"
           },
           "response": []
         },
