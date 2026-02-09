@@ -1,26 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.usersRepository.findOneBy({ email: createUserDto.email });
+
+    if (existingUser) {
+      throw new ConflictException('Email already exists');
+    }
+
+    return this.usersRepository.save(createUserDto);
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.usersRepository.find({ relations: ['profile','posts'] });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.findUserIndexById(id);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.findUserIndexById(id);
+    
+    return this.usersRepository.save({ ...user, ...updateUserDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const user = await this.findUserIndexById(id);
+
+    return this.usersRepository.delete(user.id);
+  }
+
+  private async findUserIndexById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['profile','posts'],
+    });
+
+    if (user) {
+      return user;
+    }
+
+    throw new NotFoundException(`User not found`);
+  }
+
+  public async findByEmail(email: string): Promise<User | null> {
+    const user = await this.usersRepository.findOneBy({ email });
+
+    if (user) {
+      return user;
+    }
+
+    throw new NotFoundException(`Email not found`);
   }
 }
