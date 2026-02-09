@@ -23,7 +23,7 @@ export class UsersService {
   }
 
   findAll() {
-    return this.usersRepository.find({ relations: ['profile','posts'] });
+    return this.usersRepository.find({ relations: ['profile', 'posts', 'roles'] });
   }
 
   findOne(id: number) {
@@ -45,7 +45,7 @@ export class UsersService {
   private async findUserIndexById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
-      relations: ['profile','posts'],
+      relations: ['profile', 'posts', 'roles'],
     });
 
     if (user) {
